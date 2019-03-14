@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="node_modules/jsbarcode/dist/JsBarcode.all.min.js"></script>
+    <script type="text/javascript" src="qrcode.js"></script>
+    <script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
+    <style>
+    .box{
+        display:flex;flex-flow:row wrap;
+    }
+    .box div{width:300px;height: 300px;}
+    </style>
+</head>
+<body ng-app="App" ng-controller="AppController">
+    <div>
+        <input type="radio" ng-model="codetype" value="bar"/>Barcode
+        <input type="radio" ng-model="codetype" value="qr"/>QR
+    </div>
+    <div class="box">
+        <barcode ng-if="codetype=='bar'" ng-repeat="i in data" width="200" height="100" value="i.id"></barcode>
+        <qrcode ng-if="codetype=='qr'" ng-repeat="i in data" width="200" height="200" value="i.id"></qrcode>
+    </div>
+    
+
+    <script type="text/javascript">
+    angular.module("App",[])
+    .factory("util",function(){
+        var i=new Date().getTime();
+        return new function(){
+            this.UID=function(){
+                return i++;
+            }
+        }
+    })
+    .controller("AppController",["$scope","util",function(s,util){
+        s.data=new Array(10).fill(0).map((x)=>{return {id:util.UID()}})
+    }])
+    .directive("barcode",function(){
+        return {
+            restrict:"E",
+            templateUrl:"barcode.html",
+            scope:{value:"=",width:"@?",height:"@?"},
+            link:function(s,e,a){
+                s.width=s.width||200
+                s.height=s.height||100
+                var canvas=e.children(0)[1]
+                s.$watchGroup(["value","width","height"],function(){
+                    JsBarcode(canvas, s.value);
+                })
+            }
+        }
+    })
+    .directive("qrcode",function(){
+        return {
+            restrict:"E",
+            templateUrl:"qrcode.html",
+            scope:{value:"=",width:"@?",height:"@?"},
+            link:function(s,e,a){
+                s.width=s.width||200
+                s.height=s.height||100
+                var canvas=e.children(0)[1]
+                s.$watchGroup(["value","width","height"],function(){
+                    new QRCode(canvas, {
+                        text: ""+s.value,
+                        width: s.width,
+                        height: s.height,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                })
+            }
+        }
+    })
+    </script>
+    <script type="text/ng-template" id="barcode.html">
+        <style>
+            .barcode-inline{display:inline-block}
+            .barcode-border{border:1px solid silver}
+        </style>
+        <canvas class="barcode-border barcode-inline " width="{{width}}" height="{{height}}"></canvas>
+    </script>
+    <script type="text/ng-template" id="qrcode.html">
+        <style>
+            .qrcode-inline{display:inline-block}
+            .qrcode-border{border:1px solid silver}
+        </style>
+        <div class="qrcode-border qrcode-inline " width="{{width}}" height="{{height}}"></div>  
+    </script>
+</body>
+</html>

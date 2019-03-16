@@ -1,0 +1,7 @@
+.qrbar-labelbox{margin:5px;font-size: xx-small;display:flex;flex-flow:row wrap;justify-content: space-between;}
+.qrbar-databox{display:flex;}
+.qrbar-databox>*:nth-child(1){flex:0 1 25%;}
+.qrbar-databox>*:nth-child(2){flex:0 1 75%;}
+.qrbar-inlineblock{display:inline-block}
+.qrbar-stdborder{border:1px solid silver}
+.qrbar-labeltext{vertical-align:top;overflow: hidden;padding: 5px;word-wrap: break-word;word-break: break-all;box-sizing: border-box}

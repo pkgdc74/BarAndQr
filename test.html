@@ -5,19 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript" src="main.js"></script>
-    <script type="text/javascript" src="node_modules/jsbarcode/dist/JsBarcode.all.min.js"></script>
-    <script type="text/javascript" src="qrcode.js"></script>
+    <script type="text/javascript" src="qrbar.js"></script>
     <script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
+    <script type="text/javascript" src="qrbarlabel.js"></script>
+    <link rel="stylesheet" href="qrbarlabel.css">
     <style>
         .box{display:flex;flex-flow:row wrap;}
-        .labelbox{margin:5px;font-size: xx-small;display:flex;flex-flow:row wrap;justify-content: space-between;}
-        .databox{display:flex;}
-        .databox>*:nth-child(1){flex:0 1 25%;}
-        .databox>*:nth-child(2){flex:0 1 75%;}
-        .inlineblock{display:inline-block}
-        .stdborder{border:1px solid silver}
-        .labeltext{vertical-align:top;overflow: hidden;padding: 5px;word-wrap: break-word;word-break: break-all;box-sizing: border-box}
     </style>
 </head>
 <body ng-app="App" ng-controller="AppController">
@@ -27,15 +20,14 @@
     </div>
     <div class="box">
         <qrcode ng-if="codetype=='qr'" 
-            ng-repeat="i in data" width="72" height="72" code="i.id" 
+            ng-repeat="i in data" width="144" height="72" code="i.id" 
             data="{name:'praveen',age:33,wife:meenu,kids:'arya',location:'newark delaware'}">
         </qrcode>
         <barcode ng-if="codetype=='bar'" 
-            ng-repeat="i in data" width="144" height="72" 
+            ng-repeat="i in data" width="144px" height="72px" 
             options="{displayValue:true,height:36,width:1,fontSize:10}" code="i.id" 
             data="{name:'praveen',age:33,wife:meenu,kids:'arya',location:'newark delaware'}">
         </barcode>
-        
     </div>
     <script type="text/javascript">
     angular.module("App",["AssetsUI"])
@@ -48,66 +40,10 @@
         }
     })
     .controller("AppController",["$scope","util",function(s,util){
-        s.codetype="bar";
+        s.codetype="qr";
         s.data=new Array(10).fill(0).map((x)=>{return {id:util.UID()}})
     }])
-    angular.module("AssetsUI",[])
-    .directive("qrcode",function(){
-        return {
-            restrict:"E",
-            template:''
-            +'<div style="display:inline-block">'
-            +'  <div class="labelbox stdborder">'
-            +'    <div class="inlineblock labeltext" style="width:{{width*2}}px;height: {{height}}px;">'
-            +'        <div>{{code}}</div>'
-            +'        <div ng-repeat="(k,v) in data" class="databox"><span>{{k}}</span><span>: {{v}}</span></div>'
-            +'    </div>'
-            +'    <div class="inlineblock stdborder" width="{{width}}" height="{{height}}"></div>'
-            +'  </div>'
-            +'</div>',
-            scope:{code:"=",data:"=?",width:"@?",height:"@?"},
-            link:function(s,e,a){
-                s.width=s.width||200
-                s.height=s.height||100
-                var canvas=e.children(0).children(0).children(0)[1]
-                s.$watchGroup(["code","width","height"],function(){
-                    new QRCode(canvas, {
-                        text: ""+s.code,
-                        width: s.width,
-                        height: s.height,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
-                    });
-                })
-            }
-        }
-    })
-    .directive("barcode",function(){
-        return {
-            restrict:"E",
-            template:''
-            +'<div style="display:inline-block">'
-            +'  <div class="labelbox stdborder">'
-            +'      <div class="inlineblock labeltext" style="width:{{width}};height: {{height}};">'
-            +'          <div>{{code}}</div>'
-            +'          <div ng-repeat="(k,v) in data" class="databox"><span>{{k}}</span><span>: {{v}}</span></div>'
-            +'      </div>'
-            +'      <canvas class="inlineblock"></canvas>'
-            +'  </div>'
-            +'</div>',
-            scope:{code:"=",data:"=?",width:"@?",height:"@?",options:"=?"},
-            link:function(s,e,a){
-                s.options=s.options||{displayValue:true,height:36,width:1,fontSize:10}
-                s.width=s.width||"144px"
-                s.height=s.height||"72px"
-                var canvas=e.children(0).children(0).children(0)[1]
-                s.$watchGroup(["code","width","height","options"],function(){
-                    JsBarcode(canvas, s.code,s.options);
-                })
-            }
-        }
-    })    
+        
     </script>
 </body>
 </html>
